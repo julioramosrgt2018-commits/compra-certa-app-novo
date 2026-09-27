@@ -76,8 +76,8 @@ transition: 0.2s;
 .card h3 { margin-bottom: 10px; font-size: 1rem; color: var(--accent); }
 
 label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-top: 5px; }
-input, select, textarea, button { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 12px; background: #2a2a2a; border: 1px solid var(--border); color: #fff; border-radius: 6px; font-size: 1rem; }
-button { background: var(--primary); color: #fff; font-weight: bold; border: none; cursor: pointer; transition: background 0.2s; }
+input, select, textarea { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 12px; background: #2a2a2a; border: 1px solid var(--border); color: #fff; border-radius: 6px; font-size: 1rem; }
+button { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 12px; background: var(--primary); color: #fff; font-weight: bold; border: none; cursor: pointer; transition: background 0.2s; border-radius: 6px; font-size: 1rem; }
 button:hover { background: var(--primary-hover); }
 button.danger { background: var(--danger); }
 button.danger:hover { background: #b91c1c; }
@@ -86,17 +86,22 @@ button.success:hover { background: #15803d; }
 button.secondary { background: #374151; }
 button.secondary:hover { background: #4b5563; }
 
+/* Botões específicos para ajuste de quantidade no carrinho */
+.qty-control { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.qty-btn { width: 32px !important; height: 32px !important; padding: 0 !important; margin: 0 !important; background: #374151 !important; color: #fff !important; font-weight: bold; font-size: 1.1rem; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--border); }
+.qty-btn:hover { background: var(--primary) !important; }
+
 .flex-row { display: flex; gap: 10px; }
 .flex-row > * { flex: 1; }
 
 table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-th, td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border); }
+th, td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
 th { color: var(--text-muted); }
 
 #reader { width: 100%; max-height: 300px; background: #000; border-radius: 6px; overflow: hidden; margin-bottom: 10px; display: none; }
 .preview-img { width: 100%; max-height: 200px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border); margin-top: 10px; display: none; background: #000; }
 
-.badge-status { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block; text-align: center; }
+.badge-status { padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; display: inline-block; text-align: center; }
 .status-vencido { background-color: var(--danger); color: #fff; }
 .status-hoje { background-color: var(--warning); color: #fff; }
 .status-breve { background-color: var(--accent); color: #000; }
@@ -164,7 +169,7 @@ Compra Certa
 <h3>🛒 Itens no Carrinho</h3>
 <table>
 <thead>
-<tr><th>Item</th><th>Qtd</th><th>Total</th><th>Ação</th></tr>
+<tr><th>Item</th><th style="text-align:center;">Qtd</th><th>Total</th><th>Ação</th></tr>
 </thead>
 <tbody id="tabelaCarrinho"></tbody>
 </table>
@@ -243,7 +248,7 @@ Compra Certa
 <div id="precos" class="tab-content">
 <div class="card">
 <h3>📊 Comparador e Validação Inteligente</h3>
-<p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Cruza os itens do carrinho atual com o histórico de preços para conferência de valores:</p>
+<p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Conferência ativa cruzando o carrinho com o histórico (✔ Preço OK ou ❌ Divergência):</p>
 <div id="comparadorContainer"></div>
 </div>
 </div>
@@ -371,9 +376,9 @@ totalGeral += totalItem;
 const codigoHtml = item.codigo ? '<br><small style="color:var(--text-muted)">Cód: ' + item.codigo + '</small>' : '';
 tbody.innerHTML += '<tr>' +
 '<td><strong>' + item.produto + '</strong>' + codigoHtml + '<br><small style="color:var(--accent)">' + item.mercado + '</small></td>' +
-'<td><div style="display:flex; align-items:center; gap:5px;"><button type="button" onclick="alterarQtd(' + index + ', -1)" style="padding:2px 6px; width:auto; margin:0;">-</button>' + item.qtd + '<button type="button" onclick="alterarQtd(' + index + ', 1)" style="padding:2px 6px; width:auto; margin:0;">+</button></div></td>' +
+'<td style="text-align:center;"><div class="qty-control"><button type="button" class="qty-btn" onclick="alterarQtd(' + index + ', -1)">-</button><span style="min-width:20px; text-align:center; font-weight:bold;">' + item.qtd + '</span><button type="button" class="qty-btn" onclick="alterarQtd(' + index + ', 1)">+</button></div></td>' +
 '<td>' + formatarMoeda(totalItem) + '</td>' +
-'<td><button type="button" onclick="removerItem(' + index + ')" class="danger" style="padding:4px 8px; font-size:0.8rem;">X</button></td>' +
+'<td><button type="button" onclick="removerItem(' + index + ')" class="danger" style="padding:6px 10px; font-size:0.8rem; width:auto; margin:0;">X</button></td>' +
 '</tr>';
 });
 
@@ -497,7 +502,7 @@ let html = '<table><thead><tr><th>Produto</th><th>Ação / Validar no Ato</th></
 historicoProdutos.forEach(function(hp, index) {
 html += '<tr>' +
 '<td><strong>' + hp.produto + '</strong><br><small style="color:var(--text-muted)">Cód: ' + (hp.codigo || 'Não registado') + ' | ' + hp.mercado + '</small></td>' +
-'<td><button type="button" onclick="comprarItemHistorico(' + index + ')" class="success" style="padding:6px 10px; font-size:0.8rem;">✔ Comprar / Validar</button></td>' +
+'<td><button type="button" onclick="comprarItemHistorico(' + index + ')" class="success" style="padding:6px 10px; font-size:0.8rem; width:auto; margin:0;">✔ Comprar / Validar</button></td>' +
 '</tr>';
 });
 html += '</tbody></table>';
@@ -573,7 +578,7 @@ tbody.innerHTML += '<tr>' +
 '<td><strong>' + v.produto + '</strong></td>' +
 '<td>' + dataFormatada + '</td>' +
 '<td><span class="badge-status ' + badgeClass + '">' + statusText + '</span></td>' +
-'<td><button type="button" onclick="removerValidade(' + index + ')" class="danger" style="padding:4px 8px; font-size:0.75rem;">X</button></td>' +
+'<td><button type="button" onclick="removerValidade(' + index + ')" class="danger" style="padding:4px 8px; font-size:0.75rem; width:auto; margin:0;">X</button></td>' +
 '</tr>';
 });
 }
@@ -703,8 +708,8 @@ container.innerHTML = '<p style="color:var(--text-muted)">Ainda não há dados s
 return;
 }
 
-let html = '<p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Cruzamento entre os itens atuais do carrinho e o histórico de referência:</p>';
-html += '<table><thead><tr><th>Produto / Carrinho</th><th>Histórico Esperado</th><th>Conferência / Alerta</th></tr></thead><tbody>';
+let html = '<p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Cruzamento ativo entre o Carrinho e a Base Histórica:</p>';
+html += '<table><thead><tr><th>Produto / Preço Atual</th><th>Histórico Esperado</th><th>Conferência Visual</th></tr></thead><tbody>';
 
 const precosHistorico = {};
 historicoProdutos.forEach(hp => {
@@ -730,16 +735,16 @@ statusHtml = '<span class="badge-status status-breve">Novo / Sem Histórico</spa
 
 html += '<tr>' +
 '<td><strong>' + item.produto + '</strong><br><small style="color:var(--accent)">' + formatarMoeda(item.preco) + ' (' + item.mercado + ')</small></td>' +
-'<td>' + (ref ? formatarMoeda(ref.preco) + ' (' + ref.mercado + ')' : '-') + '</td>' +
+'<td>' + (ref ? formatarMoeda(ref.preco) + ' (' + ref.mercado + ')' : 'Primeiro registo') + '</td>' +
 '<td>' + statusHtml + '</td>' +
-'<tr>';
+'</tr>';
 });
 } else {
 historicoProdutos.forEach(hp => {
 html += '<tr>' +
 '<td><strong>' + hp.produto + '</strong></td>' +
 '<td>' + formatarMoeda(hp.precoSugestao) + ' (' + hp.mercado + ')</td>' +
-'<td><span class="badge-status status-ok">Registado</span></td>' +
+'<td><span class="badge-status status-ok">✔ Registado no Histórico</span></td>' +
 '</tr>';
 });
 }
